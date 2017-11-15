@@ -1,20 +1,14 @@
 //
 //  Links.swift
-//  PhoenixCoreSwift
+//  Phoenix-Kitsu-Core
 //
-//  Created by Job Cuppen on 09/02/17.
+//  Created by Job Cuppen on 15/11/17.
 
-import Foundation
-
-public class Links: Decodable, Cleanable, Equatable {
+public class Links: Decodable, Equatable {
   public fileprivate(set) var selfLink: String?
 
   private enum CodingKeys: String, CodingKey {
     case selfLink = "self"
-  }
-  
-  public func doCleanUp() {
-    emptyStringToNil(&selfLink)
   }
 
   public static func == (lhs: Links, rhs: Links) -> Bool {

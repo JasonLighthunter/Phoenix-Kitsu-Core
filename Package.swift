@@ -4,16 +4,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "PhoenixKitsuCore",
-    products: [
-        .library(name: "PhoenixKitsuCore", targets: ["PhoenixKitsuCore"]),
+  name: "PhoenixKitsuCore",
+  products: [
+    .library(name: "PhoenixKitsuCore", targets: ["PhoenixKitsuCore"]),
     ],
-    dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
-    ],
-    targets: [
-        .target(name: "PhoenixKitsuCore", dependencies: []),
-        .testTarget(name: "PhoenixKitsuCoreTests", dependencies: ["PhoenixKitsuCore"]),
+  dependencies: [
+    // Dependencies declare other packages that this package depends on.
+    // .package(url: /* package url */, from: "1.0.0"),
+    .package(url: "https://github.com/JasonLighthunter/Requestable.git", from: "1.0.0")
+  ],
+  targets: [
+    .target(name: "PhoenixKitsuCore", dependencies: ["Requestable"]),
+    .testTarget(name: "PhoenixKitsuCoreTests", dependencies: ["PhoenixKitsuCore"]),
     ]
 )

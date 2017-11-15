@@ -1,12 +1,10 @@
 //
 //  KitsuObjectAttributes.swift
-//  PhoenixCoreSwift
+//  Phoenix-Kitsu-Core
 //
-//  Created by Job Cuppen on 04/09/2017.
+//  Created by Job Cuppen on 15/11/17.
 
-import Foundation
-
-public protocol KitsuObjectAttributes: Cleanable, Decodable {
+public protocol KitsuObjectAttributes: Decodable {
   var createdAt: String? {get}
   var updatedAt: String? {get}
 }
