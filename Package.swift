@@ -12,7 +12,7 @@ let package = Package(
     .package(url: "https://github.com/JasonLighthunter/Requestable.git", from: "1.0.0")
   ],
   targets: [
-    .target(name: "PhoenixKitsuCore", dependencies: ["Requestable"]),
-    .testTarget(name: "PhoenixKitsuCoreTests", dependencies: ["PhoenixKitsuCore"]),
+    .target(name: "PhoenixKitsuCore", dependencies: ["Requestable"])
+    //.testTarget(name: "PhoenixKitsuCoreTests", dependencies: ["PhoenixKitsuCore"]),
     ]
 )
