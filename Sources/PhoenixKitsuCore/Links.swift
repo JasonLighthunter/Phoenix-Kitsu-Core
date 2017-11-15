@@ -1,9 +1,3 @@
-//
-//  Links.swift
-//  Phoenix-Kitsu-Core
-//
-//  Created by Job Cuppen on 15/11/17.
-
 public class Links: Decodable, Equatable {
   public fileprivate(set) var selfLink: String?
 
