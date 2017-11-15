@@ -9,8 +9,6 @@ let package = Package(
     .library(name: "PhoenixKitsuCore", targets: ["PhoenixKitsuCore"]),
     ],
   dependencies: [
-    // Dependencies declare other packages that this package depends on.
-    // .package(url: /* package url */, from: "1.0.0"),
     .package(url: "https://github.com/JasonLighthunter/Requestable.git", from: "1.0.0")
   ],
   targets: [
