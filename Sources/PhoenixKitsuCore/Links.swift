@@ -1,5 +1,5 @@
 public class Links: Decodable, Equatable {
-  public fileprivate(set) var selfLink: String?
+  public let selfLink: String?
 
   private enum CodingKeys: String, CodingKey {
     case selfLink = "self"
