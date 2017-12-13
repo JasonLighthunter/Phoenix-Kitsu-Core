@@ -1,7 +1,8 @@
 public class Image: Decodable {
+  public let tiny: String?
+  public let small: String?
+  public let medium: String?
+  public let large: String?
   public let original: String?
-  
-  private enum CodingKeys: String, CodingKey {
-    case original
-  }
+  public let meta: ImageMeta?
 }
