@@ -1,4 +1,4 @@
-public class KitsuMetaObject: Decodable {
+public class MetaObject: Decodable {
   public let count: Int
   public let statusCounts: StatusCounts?
 }
