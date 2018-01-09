@@ -13,20 +13,20 @@ class ImageTests: XCTestCase {
     "meta": [
       "dimensions": [
         "tiny": [
-          "width": "width",
-          "height": "height"
+          "width": 1,
+          "height": 2
         ],
         "small": [
-          "width": "width",
-          "height": "height"
+          "width": 1,
+          "height": 2
         ],
         "medium": [
-          "width": "width",
-          "height": "height"
+          "width": 1,
+          "height": 2
         ],
         "large": [
-          "width": "width",
-          "height": "height"
+          "width": 1,
+          "height": 2
         ]
       ]
     ]
@@ -109,8 +109,8 @@ class ImageTests: XCTestCase {
     
     XCTAssertNotNil(imageMetaDimension)
     
-    XCTAssertEqual(imageMetaDimension?.height, "height")
-    XCTAssertEqual(imageMetaDimension?.width, "width")
+    XCTAssertEqual(imageMetaDimension?.height, 2)
+    XCTAssertEqual(imageMetaDimension?.width, 1)
   }
 }
 

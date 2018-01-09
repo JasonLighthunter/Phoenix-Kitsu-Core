@@ -1,4 +1,4 @@
 public class ImageMetaDimension: Decodable {
-  public let width: String?
-  public let height: String?
+  public let width: Int?
+  public let height: Int?
 }
