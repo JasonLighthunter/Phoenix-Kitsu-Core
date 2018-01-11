@@ -15,7 +15,7 @@ public protocol HasAttributes: Decodable {
   var attributes: KitsuObjectAttributesType? {get}
 }
 
-open public class KitsuObject: Decodable {
+open class KitsuObject: Decodable {
   public let objectID: String
   public let type: String
   public let links: Links
