@@ -1,6 +1,6 @@
 import Requestable
 
-public protocol KitsuObject: Decodable, Requestable {
+public protocol KitsuObject: Decodable {
   associatedtype KitsuObjectAttributesType: KitsuObjectAttributes
   
   var objectID: String {get}
