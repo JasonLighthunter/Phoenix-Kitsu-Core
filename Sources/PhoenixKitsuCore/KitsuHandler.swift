@@ -3,7 +3,6 @@ import Requestable
 
 public class KitsuHandler {
   private static let decoder = JSONDecoder()
-//  private static let test = PhoenixCore()
   
   /// Retrieves a KitsuObject that corresponds with the given id and type, and feeds it to the
   /// given clojure
