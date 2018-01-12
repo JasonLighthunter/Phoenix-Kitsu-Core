@@ -1,6 +1,6 @@
 import Requestable
 
-public class SearchResult<T: HasKitsuObjectAttributes & Requestable>: Decodable {
+public class SearchResult<T: Decodable & Requestable>: Decodable {
   public let data: [T]?
   public let meta: MetaObject?
   public let pagingLinks: PagingLinks?

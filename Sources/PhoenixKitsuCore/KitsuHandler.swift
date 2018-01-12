@@ -10,7 +10,7 @@ public class KitsuHandler {
   /// - Parameters:
   ///   - objectID: The id for the desired object
   ///   - callback: The callback to be triggered when the object is fetched
-  public class func getResource<T: HasKitsuObjectAttributes & Requestable>(by objectID: Int,
+  public class func getResource<T: Decodable & Requestable>(by objectID: Int,
                                                      callback: @escaping (T?) -> ()) throws {
     let url = Constants.baseURL + T.requestURLString + String(objectID)
     
