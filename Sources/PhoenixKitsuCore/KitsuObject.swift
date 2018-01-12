@@ -1,14 +1,21 @@
-open class KitsuObject<T: KitsuObjectAttributes>: Decodable {
+public protocol HasKitsuObjectAttributes: Decodable {
+  associatedtype KitsuObjectAttributesType: KitsuObjectAttributes
+  
+  var attributes: KitsuObjectAttributesType? {get}
+//  func getTitleWith(identifier: TitleLanguageIdentifierEnum) -> String
+}
+
+open class KitsuObject: Decodable {
   public let objectID: String
   public let type: String
   public let links: Links
-  public let attributes: T?
+//  public let attributes: T?
   
   private enum CodingKeys: String, CodingKey {
     case objectID = "id"
     case type
     case links
-    case attributes
+//    case attributes
   }
   
   public required init(from decoder: Decoder) throws {
@@ -16,6 +23,6 @@ open class KitsuObject<T: KitsuObjectAttributes>: Decodable {
     objectID = try container.decode(String.self, forKey: .objectID)
     type = try container.decode(String.self, forKey: .type)
     links = try container.decode(Links.self, forKey: .links)
-    attributes = try? container.decode(T.self, forKey: .attributes)
+//    attributes = try? container.decode(T.self, forKey: .attributes)
   }
 }
