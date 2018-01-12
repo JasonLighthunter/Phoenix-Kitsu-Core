@@ -1,16 +1,16 @@
-public protocol KitsuObjectAttributes : Decodable {
+public protocol KitsuObjectAttributesWithOptionalTimeStamp : Decodable {
   var createdAt: String? {get}
   var updatedAt: String? {get}
 }
 
-public protocol KitsuObjectAttributesWithoutTimeStamp: Decodable {
+public protocol KitsuObjectAttributes: Decodable {
 }
 
-public protocol KitsuObjectAttributesWithUpdatedAt: KitsuObjectAttributesWithoutTimeStamp {
+public protocol KitsuObjectAttributesWithUpdatedAt: KitsuObjectAttributes {
   var updatedAt: String {get}
 }
 
-public protocol KitsuObjectAttributesWithCreatedAt: KitsuObjectAttributesWithoutTimeStamp {
+public protocol KitsuObjectAttributesWithCreatedAt: KitsuObjectAttributes {
   var createdAt: String {get}
 }
 
