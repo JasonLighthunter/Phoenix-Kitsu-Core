@@ -5,17 +5,27 @@ public protocol HasKitsuObjectAttributes: Decodable {
 //  func getTitleWith(identifier: TitleLanguageIdentifierEnum) -> String
 }
 
-open class KitsuObject: Decodable {
+//extension HasKitsuObjectAttributes {
+//
+//  public required init(from decoder: Decoder) throws {
+//    let container = try decoder.container(keyedBy: CodingKeys.self)
+//  }
+//}
+
+
+open class KitsuObject<T : KitsuObjectAttributes>: HasKitsuObjectAttributes, Decodable {
+  public typealias KitsuObjectAttributesType = T
+  
   public let objectID: String
   public let type: String
   public let links: Links
-//  public let attributes: T?
+  public let attributes: KitsuObjectAttributesType?
   
   private enum CodingKeys: String, CodingKey {
     case objectID = "id"
     case type
     case links
-//    case attributes
+    case attributes
   }
   
   public required init(from decoder: Decoder) throws {
@@ -23,6 +33,6 @@ open class KitsuObject: Decodable {
     objectID = try container.decode(String.self, forKey: .objectID)
     type = try container.decode(String.self, forKey: .type)
     links = try container.decode(Links.self, forKey: .links)
-//    attributes = try? container.decode(T.self, forKey: .attributes)
+    attributes = try? container.decode(KitsuObjectAttributesType.self, forKey: .attributes)
   }
 }
