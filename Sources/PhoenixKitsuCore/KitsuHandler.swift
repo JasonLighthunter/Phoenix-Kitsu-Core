@@ -3,9 +3,15 @@ import Requestable
 
 public class KitsuHandler {
   private static let decoder = JSONDecoder()
-  private static let test = PhoenixCore()
+//  private static let test = PhoenixCore()
   
-  public class func getResource<T: Requestable & Decodable>(by objectID: Int,
+  /// Retrieves a KitsuObject that corresponds with the given id and type, and feeds it to the
+  /// given clojure
+  ///
+  /// - Parameters:
+  ///   - objectID: The id for the desired object
+  ///   - callback: The callback to be triggered when the object is fetched
+  public class func getResource<T: HasKitsuObjectAttributes & Requestable>(by objectID: Int,
                                                      callback: @escaping (T?) -> ()) throws {
     let url = Constants.baseURL + T.requestURLString + String(objectID)
     
@@ -23,6 +29,12 @@ public class KitsuHandler {
     }
   }
   
+  /// Retrieves a list of KitsuObjects that correspond with the given filters and feeds it to
+  /// the given clojure
+  ///
+  /// - Parameters:
+  ///   - filters: The filter dictionary to use for searching for the desired objects
+  ///   - callback: The callback to be triggered when the list of objects is fetched
   public class func getCollection<T>(by filters: [String : String]?,
                               callback: @escaping (SearchResult<T>?) -> ()) throws {
     var url = Constants.baseURL + T.requestURLString
@@ -36,6 +48,12 @@ public class KitsuHandler {
     getCollection(by: url) { searchResult in callback(searchResult)}
   }
   
+  /// Retrieves a list of KitsuObjects that corresponds with the given url and feeds it to the
+  /// given clojure
+  ///
+  /// - Parameters:
+  ///   - url: The url to use for retrieving a list of objects
+  ///   - callback: The callback to be triggered when the list of objects is fetched
   public class func getCollection<T>(by url: String, callback: @escaping (SearchResult<T>?) -> ()) {
     NetworkingUtil.getDataFrom(url) { responseData, error in
       guard error == nil,
