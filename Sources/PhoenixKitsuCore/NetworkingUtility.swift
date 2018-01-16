@@ -13,13 +13,13 @@ class NetworkingUtility {
   /// - Parameters:
   ///   - url: The url of the desired resource or collection
   ///   - callback: The callback to be triggered when json is fetched
-  func getDataFrom(_ url: String, callback: @escaping (Data?, Error?) -> Void) {
+  public func getDataFrom(_ url: String, callback: @escaping (Data?, Error?) -> Void) {
     Alamofire.request(url, headers: Constants.baseHeaders).responseData { response in
       self.handle(response: response, callback)
     }
   }
   
-  func getToken(with username: String, and password: String,
+  public func getToken(with username: String, and password: String,
                       callback: @escaping (Data?, Error?) -> ()) {
     let url = Constants.tokenURL
     let method = HTTPMethod.post
@@ -40,7 +40,7 @@ class NetworkingUtility {
     }
   }
   
-  func refreshToken(with refreshToken: String, _ callback: @escaping (Data?, Error?) -> ()) {
+  public func refreshToken(with refreshToken: String, _ callback: @escaping (Data?, Error?) -> ()) {
     let url = Constants.tokenURL
     let method = HTTPMethod.post
     let parameters: Parameters = [

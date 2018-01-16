@@ -16,7 +16,7 @@ public class KitsuHandler {
   /// - Parameters:
   ///   - objectID: The id for the desired object
   ///   - callback: The callback to be triggered when the object is fetched
-  func getResource<T: Decodable & Requestable>(by objectID: Int, callback: @escaping (T?) -> ()) {
+  public func getResource<T: Decodable & Requestable>(by objectID: Int, callback: @escaping (T?) -> ()) {
     let url = Constants.endpointBaseURL + T.requestURLString + String(objectID)
     
     networkingUtility.getDataFrom(url) { response, error in
@@ -39,7 +39,7 @@ public class KitsuHandler {
   /// - Parameters:
   ///   - filters: The filter dictionary to use for searching for the desired objects
   ///   - callback: The callback to be triggered when the list of objects is fetched
-  func getCollection<T>(by filters: [String : String]?,
+  public func getCollection<T>(by filters: [String : String]?,
                         callback: @escaping (SearchResult<T>?) -> ()) {
     var url = Constants.endpointBaseURL + T.requestURLString
     
@@ -58,7 +58,7 @@ public class KitsuHandler {
   /// - Parameters:
   ///   - url: The url to use for retrieving a list of objects
   ///   - callback: The callback to be triggered when the list of objects is fetched
-  func getCollection<T>(by url: String, callback: @escaping (SearchResult<T>?) -> Void) {
+  public func getCollection<T>(by url: String, callback: @escaping (SearchResult<T>?) -> Void) {
     networkingUtility.getDataFrom(url) { responseData, error in
       guard error == nil,
         let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: responseData!)
