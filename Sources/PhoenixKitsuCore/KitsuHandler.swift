@@ -40,7 +40,7 @@ public class KitsuHandler {
   ///   - filters: The filter dictionary to use for searching for the desired objects
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getCollection<T>(by filters: [String : String]?,
-                        callback: @escaping (SearchResult<T>?) -> ()) {
+                               callback: @escaping (SearchResult<T>?) -> ()) {
     var url = Constants.requestBaseURL + T.requestURLString
     
     if let filters = filters {
@@ -60,7 +60,8 @@ public class KitsuHandler {
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getCollection<T>(by url: String, callback: @escaping (SearchResult<T>?) -> Void) {
     networkingUtility.getDataFrom(url, and: Constants.requestHeaders) { responseData, error in
-      guard error == nil,
+      guard
+        error == nil,
         let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: responseData!)
         else {
           return callback(nil)
@@ -68,6 +69,31 @@ public class KitsuHandler {
       callback(searchResult)
     }
   }
+  
+  /// Retrieves a tokenResponse from kitsu.io
+  ///
+  /// - Parameters:
+  ///   - username: The username of the user trying to authenticate
+  ///   - password: The password of the user trying to authenticate
+  ///   - callback: The callback to be triggered when the list of objects is fetched
+  public func getTokenResponse(with username: String, and password: String,
+                               callback: @escaping (TokenResponse?) -> Void) {
+    let url = Constants.tokenURL
+    let parameters: [String : String] = [
+      "grant_type" : "password",
+      "username" : username,
+      "password" : password
+    ]
+    let headers = Constants.clientCredentialHeaders
+    
+    networkingUtility.getTokenFrom(url, parameters, headers) { responseData, error in
+      guard error == nil else { return callback(nil) }
+      
+      if let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: responseData!) {
+        callback(tokenResponse)
+      }
+      return callback(nil)
+    }
+  }
 }
-
 

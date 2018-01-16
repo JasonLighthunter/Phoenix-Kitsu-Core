@@ -9,9 +9,7 @@ public class NetworkingUtility {
     }
   }
 
-  public init() {
-    
-  }
+  public init() {}
   /// Retrieves json from the kitsu.io API and feeds it to the given clojure
   ///
   /// - Parameters:
@@ -30,70 +28,23 @@ public class NetworkingUtility {
     }
   }
   
-  public func refreshToken(_ url: String, with refreshToken: String, _ headers: HTTPHeaders,
-                          callback: @escaping (Data?, Error?) -> Void) {
-    let parameters: Parameters = [
-      "grant_type" : "refresh_token",
-      "refresh_token" : refreshToken
-    ]
-    
-    Alamofire.request(url, method: HTTPMethod.post, parameters: parameters, headers: headers)
-      .responseData { response in
-        self.handle(response: response, callback)
-    }
-  }
-  
-  public func getTokenFrom(_ url: String, with username: String, and password: String,
-                           _ headers: HTTPHeaders, callback: @escaping (Data?, Error?) -> Void) {
-    let parameters: Parameters = [
-      "grant_type" : "password",
-      "username" : username,
-      "password" : password
-    ]
-    
-    Alamofire.request(url, method: HTTPMethod.post, parameters: parameters, headers: headers)
-      .responseData { response in
-        self.handle(response: response, callback)
-    }
-  }
-//  public func getToken(with username: String, and password: String,
-//                      callback: @escaping (Data?, Error?) -> ()) {
-//    let url = Constants.tokenURL
-//    let method = HTTPMethod.post
-//    let parameters: Parameters = [
-//      "grant_type" : "password",
-//      "username" : username,
-//      "password" : password
-//    ]
-//    let headers = Constants.clientCredentialHeaders
-//
-//    Alamofire.request(url, method: method, parameters: parameters, headers: headers)
-//      .responseData { response in
-//        self.handle(response: response, callback)
-////        switch response.result {
-////        case .failure(let error): callback(nil, error)
-////        case .success:callback(response.result.value, nil)
-////        }
-//    }
-//  }
-  
-//  public func refreshToken(with refreshToken: String, _ callback: @escaping (Data?, Error?) -> ()) {
-//    let url = Constants.tokenURL
-//    let method = HTTPMethod.post
+//  public func refreshToken(_ url: String, with refreshToken: String, _ headers: HTTPHeaders,
+//                          callback: @escaping (Data?, Error?) -> Void) {
 //    let parameters: Parameters = [
 //      "grant_type" : "refresh_token",
 //      "refresh_token" : refreshToken
 //    ]
-//    let headers = Constants.clientCredentialHeaders
-//
-//    Alamofire.request(url, method: method, parameters: parameters, headers: headers)
+//    
+//    Alamofire.request(url, method: HTTPMethod.post, parameters: parameters, headers: headers)
 //      .responseData { response in
 //        self.handle(response: response, callback)
-////        switch response.result {
-////        case .failure(let error): callback(nil, error)
-////        case .success:callback(response.result.value, nil)
-////        }
 //    }
 //  }
-  
+
+  public func getTokenFrom(_ url: String, _ parameters: Parameters, _ headers: HTTPHeaders, callback: @escaping (Data?, Error?) -> Void) {
+    Alamofire.request(url, method: HTTPMethod.post, parameters: parameters, headers: headers)
+      .responseData { response in
+        self.handle(response: response, callback)
+    }
+  }
 }
