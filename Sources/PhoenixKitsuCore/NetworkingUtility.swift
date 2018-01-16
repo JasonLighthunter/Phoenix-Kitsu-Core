@@ -8,6 +8,8 @@ public class NetworkingUtility {
 //    case .success: callback(response.result.value, nil)
 //    }
 //  }
+  public init() {
+  }
 
   /// Retrieves json from the kitsu.io API and feeds it to the given clojure
   ///
