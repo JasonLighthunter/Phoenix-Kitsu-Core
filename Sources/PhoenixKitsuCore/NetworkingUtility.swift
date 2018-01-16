@@ -2,12 +2,12 @@ import Foundation
 import Alamofire
 
 public class NetworkingUtility {
-//  private func handle(response: DataResponse<Data>, _ callback: (Data?, Error?) -> ()) {
-//    switch response.result {
-//    case .failure(let error): callback(nil, error)
-//    case .success: callback(response.result.value, nil)
-//    }
-//  }
+  private func handle(response: DataResponse<Data>, _ callback: (Data?, Error?) -> ()) {
+    switch response.result {
+    case .failure(let error): callback(nil, error)
+    case .success: callback(response.result.value, nil)
+    }
+  }
 
   public init() {
     
@@ -20,13 +20,23 @@ public class NetworkingUtility {
   public func getDataFrom(_ url: String, and headers: HTTPHeaders,
                           callback: @escaping (Data?, Error?) -> Void) {
     Alamofire.request(url, headers: headers).responseData { response in
-      switch response.result {
-      case .failure(let error): callback(nil, error)
-      case .success: callback(response.result.value, nil)
-      }
+      self.handle(response: response, callback)
+//      switch response.result {
+//      case .failure(let error): callback(nil, error)
+//      case .success: callback(response.result.value, nil)
+//      }
     }
   }
   
+  public func getDataFrom(_ url: String, callback: @escaping (Data?, Error?) -> Void) {
+    Alamofire.request(url).responseData { response in
+      self.handle(response: response, callback)
+//      switch response.result {
+//      case .failure(let error): callback(nil, error)
+//      case .success: callback(response.result.value, nil)
+//      }
+    }
+  }
 //  public func getToken(with username: String, and password: String,
 //                      callback: @escaping (Data?, Error?) -> ()) {
 //    let url = Constants.tokenURL
