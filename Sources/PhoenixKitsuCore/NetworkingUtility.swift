@@ -1,18 +1,62 @@
 import Foundation
 import Alamofire
 
-class NetworkingUtility {  
+class NetworkingUtility {
+  private func handle(response: DataResponse<Data>, _ callback: (Data?, Error?) -> ()) {
+    switch response.result {
+    case .failure(let error): callback(nil, error)
+    case .success: callback(response.result.value, nil)
+    }
+  }
   /// Retrieves json from the kitsu.io API and feeds it to the given clojure
   ///
   /// - Parameters:
   ///   - url: The url of the desired resource or collection
   ///   - callback: The callback to be triggered when json is fetched
   func getDataFrom(_ url: String, callback: @escaping (Data?, Error?) -> Void) {
-    Alamofire.request(url, headers: Constants.baseHeaders).responseData { res in
-      switch res.result {
-      case .failure(let error): callback(nil, error)
-      case .success: callback(res.data, nil)
-      }
+    Alamofire.request(url, headers: Constants.baseHeaders).responseData { response in
+      self.handle(response: response, callback)
     }
   }
+  
+  func getToken(with username: String, and password: String,
+                      callback: @escaping (Data?, Error?) -> ()) {
+    let url = Constants.tokenURL
+    let method = HTTPMethod.post
+    let parameters: Parameters = [
+      "grant_type" : "password",
+      "username" : username,
+      "password" : password
+    ]
+    let headers = Constants.clientCredentialHeaders
+    
+    Alamofire.request(url, method: method, parameters: parameters, headers: headers)
+      .responseData { response in
+        self.handle(response: response, callback)
+//        switch response.result {
+//        case .failure(let error): callback(nil, error)
+//        case .success:callback(response.result.value, nil)
+//        }
+    }
+  }
+  
+  func refreshToken(with refreshToken: String, _ callback: @escaping (Data?, Error?) -> ()) {
+    let url = Constants.tokenURL
+    let method = HTTPMethod.post
+    let parameters: Parameters = [
+      "grant_type" : "refresh_token",
+      "refresh_token" : refreshToken
+    ]
+    let headers = Constants.clientCredentialHeaders
+    
+    Alamofire.request(url, method: method, parameters: parameters, headers: headers)
+      .responseData { response in
+        self.handle(response: response, callback)
+//        switch response.result {
+//        case .failure(let error): callback(nil, error)
+//        case .success:callback(response.result.value, nil)
+//        }
+    }
+  }
+  
 }

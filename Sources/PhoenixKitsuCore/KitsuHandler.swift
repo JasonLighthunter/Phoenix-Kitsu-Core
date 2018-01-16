@@ -17,7 +17,7 @@ public class KitsuHandler {
   ///   - objectID: The id for the desired object
   ///   - callback: The callback to be triggered when the object is fetched
   func getResource<T: Decodable & Requestable>(by objectID: Int, callback: @escaping (T?) -> ()) {
-    let url = Constants.EndpointBaseURL + T.requestURLString + String(objectID)
+    let url = Constants.endpointBaseURL + T.requestURLString + String(objectID)
     
     networkingUtility.getDataFrom(url) { response, error in
       guard
@@ -41,7 +41,7 @@ public class KitsuHandler {
   ///   - callback: The callback to be triggered when the list of objects is fetched
   func getCollection<T>(by filters: [String : String]?,
                         callback: @escaping (SearchResult<T>?) -> ()) {
-    var url = Constants.EndpointBaseURL + T.requestURLString
+    var url = Constants.endpointBaseURL + T.requestURLString
     
     if let filters = filters {
       for (key, value) in filters {
