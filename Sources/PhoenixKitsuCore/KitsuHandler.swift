@@ -5,7 +5,7 @@ public class KitsuHandler {
   private let decoder: JSONDecoder
   private let networkingUtility: NetworkingUtility
   
-  init(decoder: JSONDecoder, networkingUtility : NetworkingUtility) {
+  public init(decoder: JSONDecoder, networkingUtility : NetworkingUtility) {
     self.decoder = decoder
     self.networkingUtility = networkingUtility
   }
