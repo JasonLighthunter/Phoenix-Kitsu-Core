@@ -2,10 +2,10 @@ import Alamofire
 
 enum Constants {
   private static let baseURL = "https://kitsu.io/api/"
-  static let endpointBaseURL = baseURL + "edge/"
+  static let requestBaseURL = baseURL + "edge/"
   static let tokenURL = baseURL + "oauth/token"
     
-  static let baseHeaders: HTTPHeaders = [
+  static let requestHeaders: HTTPHeaders = [
     "Accept": "application/vnd.api+json",
     "Content-Type": "application/vnd.api+json"
   ]
