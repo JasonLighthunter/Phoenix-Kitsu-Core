@@ -9,6 +9,9 @@ public class NetworkingUtility {
 //    }
 //  }
 
+  public init() {
+    
+  }
   /// Retrieves json from the kitsu.io API and feeds it to the given clojure
   ///
   /// - Parameters:
