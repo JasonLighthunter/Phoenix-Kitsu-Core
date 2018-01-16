@@ -27,24 +27,13 @@ public class NetworkingUtility {
       self.handle(response: response, callback)
     }
   }
-  
-//  public func refreshToken(_ url: String, with refreshToken: String, _ headers: HTTPHeaders,
-//                          callback: @escaping (Data?, Error?) -> Void) {
-//    let parameters: Parameters = [
-//      "grant_type" : "refresh_token",
-//      "refresh_token" : refreshToken
-//    ]
-//    
-//    Alamofire.request(url, method: HTTPMethod.post, parameters: parameters, headers: headers)
-//      .responseData { response in
-//        self.handle(response: response, callback)
-//    }
-//  }
 
+  // codebeat:disable[ARITY]
   public func getTokenFrom(_ url: String, _ parameters: Parameters, _ headers: HTTPHeaders, callback: @escaping (Data?, Error?) -> Void) {
     Alamofire.request(url, method: HTTPMethod.post, parameters: parameters, headers: headers)
       .responseData { response in
         self.handle(response: response, callback)
     }
   }
+  // codebeat:enable[ARITY]
 }
