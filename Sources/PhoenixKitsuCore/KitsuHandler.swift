@@ -5,7 +5,7 @@ import Alamofire
 public class KitsuHandler {
   private let decoder: JSONDecoder
   
-  public init(decoder: JSONDecoder, networkingUtility : NetworkingUtility) {
+  public init(decoder: JSONDecoder) {
     self.decoder = decoder
   }
   
