@@ -1,4 +1,4 @@
-open class KitsuObject<T : KitsuObjectAttributes>: HasKitsuObjectAttributes, Decodable {
+open class KitsuObject<T: KitsuObjectAttributes>: HasKitsuObjectAttributes, Decodable {
   public let objectID: String
   public let type: String
   public let links: Links
