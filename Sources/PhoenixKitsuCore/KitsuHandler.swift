@@ -88,13 +88,21 @@ public class KitsuHandler {
     ]
     let headers = Constants.clientCredentialHeaders
     
+    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in 
+      guard error == nil else { return callback(nil) }
+      guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
+        else { return callback(nil) }
+      callback(tokenResponse)
+    }
+    
     Alamofire.request(url, method: method, parameters : parameters, headers: headers).responseData { response in
-      self.handle(response: response) { data, error in
-        guard error == nil else { return callback(nil) }
-        guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
-          else { return callback(nil) }
-        callback(tokenResponse)
-      }
+//      self.handle(response: response) { data, error in
+//        guard error == nil else { return callback(nil) }
+//        guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
+//          else { return callback(nil) }
+//        callback(tokenResponse)
+//      }
+      self.handle(response: response, innerCallback)
     }
   }
 }
