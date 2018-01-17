@@ -16,8 +16,9 @@ public class KitsuHandler {
     }
   }
   private func parseToObjectData(data: Data?) -> Data? {
-    guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?] else { return nil }
-    guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any) else { return nil }
+    let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
+    
+    guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON!["data"] as Any) else { return nil }
     
     return objectData
   }
@@ -32,8 +33,10 @@ public class KitsuHandler {
     
     let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
       guard error == nil else { return callback(nil) }
-      guard let objectData = self.parseToObjectData(data: data) else { return callback(nil) }
-      guard let object: T = try? self.decoder.decode(T.self, from: objectData) else { return callback(nil) }
+      
+      let objectData = self.parseToObjectData(data: data)
+      
+      guard let object: T = try? self.decoder.decode(T.self, from: objectData!) else { return callback(nil) }
       
       callback(object)
     }
