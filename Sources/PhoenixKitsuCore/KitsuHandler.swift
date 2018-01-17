@@ -15,6 +15,12 @@ public class KitsuHandler {
     case .success: callback(response.result.value, nil)
     }
   }
+  private func parseToObjectData(data: Data?) -> Data? {
+    guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?] else { return nil }
+    guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any) else { return nil }
+    
+    return objectData
+  }
   
   /// Retrieves a KitsuObject that corresponds with the given id and type, and feeds it to the given clojure
   ///
@@ -26,11 +32,8 @@ public class KitsuHandler {
     
     let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
       guard error == nil else { return callback(nil) }
-      guard
-        let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?],
-        let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any),
-        let object: T = try? self.decoder.decode(T.self, from: objectData)
-        else { return callback(nil) }
+      guard let objectData = self.parseToObjectData(data: data) else { return callback(nil) }
+      guard let object: T = try? self.decoder.decode(T.self, from: objectData) else { return callback(nil) }
       
       callback(object)
     }
