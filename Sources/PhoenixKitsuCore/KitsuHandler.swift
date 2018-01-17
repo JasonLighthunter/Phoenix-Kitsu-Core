@@ -43,16 +43,6 @@ public class KitsuHandler {
     
     Alamofire.request(url, headers: Constants.requestHeaders).responseData { response in
       self.handle(response: response, innerCallback)
-//        guard error == nil else { return callback(nil) }
-//        guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
-//          else { return callback(nil) }
-//        guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any)
-//          else { return callback(nil) }
-//        guard let object: T = try? self.decoder.decode(T.self, from: objectData)
-//          else { return callback(nil) }
-//
-//        callback(object)
-//      }
     }
   }
   
@@ -88,10 +78,6 @@ public class KitsuHandler {
     
     Alamofire.request(url, headers: Constants.requestHeaders).responseData { response in
       self.handle(response: response, innerCallback)
-//        guard error == nil else { return callback(nil) }
-//        guard let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
-//          else { return callback(nil) }
-//        callback(searchResult)
       }
     }
   
@@ -118,14 +104,8 @@ public class KitsuHandler {
         else { return callback(nil) }
       callback(tokenResponse)
     }
-//
+
     Alamofire.request(url, method: method, parameters : parameters, headers: headers).responseData { response in
-////      self.handle(response: response) { data, error in
-////        guard error == nil else { return callback(nil) }
-////        guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
-////          else { return callback(nil) }
-////        callback(tokenResponse)
-////      }
       self.handle(response: response, innerCallback)
     }
   }
