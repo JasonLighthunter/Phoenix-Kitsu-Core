@@ -14,7 +14,7 @@ public protocol KitsuObjectAttributesWithCreatedAt: KitsuObjectAttributes {
   var createdAt: String {get}
 }
 
-public protocol KitsuObjectAttributesWithTimestamp : KitsuObjectAttributesWithUpdatedAt,
-KitsuObjectAttributesWithCreatedAt {
+public protocol KitsuObjectAttributesWithTimestamp:
+KitsuObjectAttributesWithUpdatedAt, KitsuObjectAttributesWithCreatedAt {
   
 }
