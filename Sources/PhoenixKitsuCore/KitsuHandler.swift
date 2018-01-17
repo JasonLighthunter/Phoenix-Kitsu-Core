@@ -24,18 +24,30 @@ public class KitsuHandler {
   public func getResource<T: Decodable & Requestable>(by objectID: Int, callback: @escaping (T?) -> Void) {
     let url = Constants.requestBaseURL + T.requestURLString + String(objectID)
     
+    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
+      guard error == nil else { return callback(nil) }
+      guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
+        else { return callback(nil) }
+      guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any)
+        else { return callback(nil) }
+      guard let object: T = try? self.decoder.decode(T.self, from: objectData)
+        else { return callback(nil) }
+      
+      callback(object)
+    }
+    
     Alamofire.request(url, headers: Constants.requestHeaders).responseData { response in
-      self.handle(response: response) { data, error in
-        guard error == nil else { return callback(nil) }
-        guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
-          else { return callback(nil) }
-        guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any)
-          else { return callback(nil) }
-        guard let object: T = try? self.decoder.decode(T.self, from: objectData)
-          else { return callback(nil) }
-        
-        callback(object)
-      }
+      self.handle(response: response, innerCallback)
+//        guard error == nil else { return callback(nil) }
+//        guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
+//          else { return callback(nil) }
+//        guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any)
+//          else { return callback(nil) }
+//        guard let object: T = try? self.decoder.decode(T.self, from: objectData)
+//          else { return callback(nil) }
+//
+//        callback(object)
+//      }
     }
   }
   
@@ -62,15 +74,22 @@ public class KitsuHandler {
   ///   - url: The url to use for retrieving a list of objects
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getCollection<T>(by url: String, callback: @escaping (SearchResult<T>?) -> Void) {
+    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
+      guard error == nil else { return callback(nil) }
+      guard let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
+        else { return callback(nil) }
+      callback(searchResult)
+    }
+    
     Alamofire.request(url, headers: Constants.requestHeaders).responseData { response in
-      self.handle(response: response) { data, error in
-        guard error == nil else { return callback(nil) }
-        guard let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
-          else { return callback(nil) }
-        callback(searchResult)
+      self.handle(response: response, innerCallback)
+//        guard error == nil else { return callback(nil) }
+//        guard let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
+//          else { return callback(nil) }
+//        callback(searchResult)
       }
     }
-  }
+  
   
   /// Retrieves a tokenResponse from kitsu.io
   ///
@@ -87,22 +106,23 @@ public class KitsuHandler {
       "password" : password
     ]
     let headers = Constants.clientCredentialHeaders
-    
-    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in 
+
+    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
       guard error == nil else { return callback(nil) }
       guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
         else { return callback(nil) }
       callback(tokenResponse)
     }
-    
+//
     Alamofire.request(url, method: method, parameters : parameters, headers: headers).responseData { response in
-//      self.handle(response: response) { data, error in
-//        guard error == nil else { return callback(nil) }
-//        guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
-//          else { return callback(nil) }
-//        callback(tokenResponse)
-//      }
+////      self.handle(response: response) { data, error in
+////        guard error == nil else { return callback(nil) }
+////        guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
+////          else { return callback(nil) }
+////        callback(tokenResponse)
+////      }
       self.handle(response: response, innerCallback)
     }
   }
 }
+
