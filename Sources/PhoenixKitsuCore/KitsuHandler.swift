@@ -26,11 +26,10 @@ public class KitsuHandler {
     
     let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
       guard error == nil else { return callback(nil) }
-      guard let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
-        else { return callback(nil) }
-      guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any)
-        else { return callback(nil) }
-      guard let object: T = try? self.decoder.decode(T.self, from: objectData)
+      guard
+        let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?],
+        let objectData = try? JSONSerialization.data(withJSONObject: dataJSON["data"] as Any),
+        let object: T = try? self.decoder.decode(T.self, from: objectData)
         else { return callback(nil) }
       
       callback(object)
