@@ -26,9 +26,9 @@ public class KitsuHandler {
   private let session: URLSession
   private var dataTask: URLSessionDataTask?
   
-  public init(decoder: JSONDecoder, session: URLSession?) {
+  public init(decoder: JSONDecoder = JSONDecoder(), session: URLSession = URLSession(configuration: .default)) {
     self.decoder = decoder
-    self.session = session ?? URLSession(configuration: .default)
+    self.session = session
   }
   
   private func parseToObjectData(data: Data?) -> Data? {
