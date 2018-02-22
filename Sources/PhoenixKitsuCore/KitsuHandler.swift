@@ -2,7 +2,8 @@ import Foundation
 import Requestable
 
 extension URLRequest {
-  init(url: URL, headers: [String : String]?, parameters: [String : String]? = nil) {
+  init?(url urlString: String, headers: [String : String]?, parameters: [String : String]? = nil) {
+    guard let url = URL(string: urlString) else { return nil }
     self.init(url: url)
     
     if let headers = headers {
@@ -53,10 +54,9 @@ public class KitsuHandler {
   public func getResource<T: Decodable & Requestable>(by objectID: Int, with accessToken: String? = nil,
                                                       callback: @escaping (T?) -> Void) {
     let urlString = Constants.requestBaseURL + T.requestURLString + String(objectID)
-    guard let url = URL(string: urlString) else { return callback(nil) }
-    var request = URLRequest(url: url, headers: Constants.requestHeaders)
+    var request = URLRequest(url: urlString, headers: Constants.requestHeaders)
 
-    if accessToken != nil { request.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
+    if accessToken != nil { request!.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
     
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
@@ -65,7 +65,7 @@ public class KitsuHandler {
       callback(object)
     }
     
-    self.doRequest(request, callback: innerCallback)
+    self.doRequest(request!, callback: innerCallback)
   }
 
   private func addFilters(_ filters: [String : String]?, to url: inout String) {
@@ -97,11 +97,9 @@ public class KitsuHandler {
   ///   - accessToken: The accessToken used to authenticate the request
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getCollection<T>(by urlString: String, with accessToken: String? = nil, callback: @escaping (SearchResult<T>?) -> Void) {
+    var request = URLRequest(url: urlString, headers: Constants.requestHeaders)
     
-    guard let url = URL(string: urlString) else { return callback(nil) }
-    var request = URLRequest(url: url, headers: Constants.requestHeaders)
-    
-    if accessToken != nil { request.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
+    if accessToken != nil { request!.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
 
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
@@ -109,7 +107,7 @@ public class KitsuHandler {
       callback(searchResult)
     }
     
-    self.doRequest(request, callback: innerCallback)
+    self.doRequest(request!, callback: innerCallback)
   }
   
   /// Retrieves a tokenResponse from kitsu.io
@@ -119,16 +117,15 @@ public class KitsuHandler {
   ///   - password: The password of the user trying to authenticate
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getTokenResponse(with name: String, and password: String, callback: @escaping (TokenResponse?) -> ()) {
-    guard let url = URL(string: Constants.tokenURL) else { return callback(nil) }
-    
+    let headers = Constants.clientCredentialHeaders
     let parameters: [String : String] = [
       "grant_type" : "password",
       "username" : name,
       "password" : password
     ]
     
-    var request = URLRequest(url: url, headers: Constants.clientCredentialHeaders, parameters: parameters)
-    request.httpMethod = "POST"
+    var request = URLRequest(url: Constants.tokenURL, headers: headers, parameters: parameters)
+    request!.httpMethod = "POST"
 
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
@@ -136,7 +133,7 @@ public class KitsuHandler {
       callback(tokenResponse)
     }
     
-    self.doRequest(request, callback: innerCallback)
+    self.doRequest(request!, callback: innerCallback)
   }
   
   private func doRequest(_ request: URLRequest, callback: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
