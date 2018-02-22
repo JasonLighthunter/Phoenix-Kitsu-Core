@@ -1,6 +1,5 @@
 import Foundation
 import Requestable
-//import Alamofire
 
 public class KitsuHandler {
   private let decoder: JSONDecoder
