@@ -1,20 +1,23 @@
 import Foundation
 import Requestable
-import Alamofire
+//import Alamofire
 
 public class KitsuHandler {
   private let decoder: JSONDecoder
+  
+  private let defaultSession = URLSession(configuration: .default)
+  private var dataTask: URLSessionDataTask?
   
   public init(decoder: JSONDecoder) {
     self.decoder = decoder
   }
   
-  private func handleResponse(_ response: DataResponse<Data>, _ callback: (Data?, Error?) -> Void) {
-    switch response.result {
-    case .failure(let error): callback(nil, error)
-    case .success: callback(response.result.value, nil)
-    }
-  }
+//  private func handleResponse(_ response: DataResponse<Data>, _ callback: (Data?, Error?) -> Void) {
+//    switch response.result {
+//    case .failure(let error): callback(nil, error)
+//    case .success: callback(response.result.value, nil)
+//    }
+//  }
   
   private func parseToObjectData(data: Data?) -> Data? {
     let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
@@ -32,24 +35,25 @@ public class KitsuHandler {
   ///   - callback: The callback to be triggered when the object is fetched
   public func getResource<T: Decodable & Requestable>(by objectID: Int, with accessToken: String? = nil,
                                                       callback: @escaping (T?) -> Void) {
-    let url = Constants.requestBaseURL + T.requestURLString + String(objectID)
+    let urlString = Constants.requestBaseURL + T.requestURLString + String(objectID)
+    guard let url = URL(string: urlString) else { return callback(nil) }
     
     var headers = Constants.requestHeaders
     if let token = accessToken {
       headers["Autherization"] = "Bearer " + token
     }
     
-    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
+    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
-      
       let objectData = self.parseToObjectData(data: data)
-      
       guard let object: T = try? self.decoder.decode(T.self, from: objectData!) else { return callback(nil) }
-      
       callback(object)
     }
     
-    let request = Alamofire.request(url, headers: headers)
+    var request = URLRequest(url: url)
+    request.allHTTPHeaderFields = headers
+    
+//    let request = Alamofire.request(url, headers: headers)
     self.doRequest(request, callback: innerCallback)
   }
 
@@ -81,11 +85,14 @@ public class KitsuHandler {
   ///   - url: The url to use for retrieving a list of objects
   ///   - accessToken: The accessToken used to authenticate the request
   ///   - callback: The callback to be triggered when the list of objects is fetched
-  public func getCollection<T>(by url: String, with accessToken: String? = nil, callback: @escaping (SearchResult<T>?) -> Void) {
-    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
+  public func getCollection<T>(by urlString: String, with accessToken: String? = nil, callback: @escaping (SearchResult<T>?) -> Void) {
+    
+    guard let url = URL(string: urlString) else { return callback(nil) }
+    
+    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
       guard let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
-      else { return callback(nil) }
+        else { return callback(nil) }
       callback(searchResult)
     }
     
@@ -94,7 +101,9 @@ public class KitsuHandler {
       headers["Autherization"] = "Bearer " + token
     }
     
-    let request = Alamofire.request(url, headers: headers)
+    var request = URLRequest(url: url)
+    request.allHTTPHeaderFields = headers
+//    let request = Alamofire.request(url, headers: headers)
     self.doRequest(request, callback: innerCallback)
   }
   
@@ -105,30 +114,45 @@ public class KitsuHandler {
   ///   - password: The password of the user trying to authenticate
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getTokenResponse(with name: String, and password: String, callback: @escaping (TokenResponse?) -> ()) {
-    let url = Constants.tokenURL
-    let method = HTTPMethod.post
+    guard let url = URL(string: Constants.tokenURL) else { return callback(nil) }
+    let method = "POST"
     let parameters: [String : String] = [
       "grant_type" : "password",
       "username" : name,
       "password" : password
     ]
+    var parametersString = ""
+    parameters.forEach { key, value in
+      parametersString += key + "=" + value + "&"
+    }
+    parametersString.removeLast()
+    
+    
     let headers = Constants.clientCredentialHeaders
 
-    let innerCallback: (_ data: Data?, _ error: Error?) -> Void = { data, error in
+    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
       guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
         else { return callback(nil) }
       callback(tokenResponse)
     }
     
-    let request = Alamofire.request(url, method: method, parameters : parameters, headers: headers)
+    var request = URLRequest(url: url)
+    request.httpMethod = method
+    request.allHTTPHeaderFields = headers
+    request.httpBody = parametersString.data(using: .utf8)
+    
+//    let request = Alamofire.request(url, method: method, parameters : parameters, headers: headers)
     self.doRequest(request, callback: innerCallback)
   }
   
-  private func doRequest(_ request: DataRequest, callback: @escaping (_ data: Data?, _ error: Error?) -> Void) {
-    request.responseData { response in
-      self.handleResponse(response, callback)
-    }
+  private func doRequest(_ request: URLRequest, callback: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+//    request.responseData { response in
+//      self.handleResponse(response, callback)
+//    }
+    dataTask?.cancel()
+    dataTask = defaultSession.dataTask(with: request, completionHandler: callback)
+    dataTask?.resume()
   }
 }
 
