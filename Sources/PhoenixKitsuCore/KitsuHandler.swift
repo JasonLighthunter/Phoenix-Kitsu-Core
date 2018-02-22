@@ -1,28 +1,40 @@
 import Foundation
 import Requestable
 
+extension URLRequest {
+  init(url: URL, method: String? = "GET", headers: [String : String]?, parameters: [String : String]? = nil) {
+    self.init(url: url)
+    
+    self.httpMethod = method
+    
+    if let headers = headers {
+      self.allHTTPHeaderFields = headers
+    }
+    
+    if let parameters = parameters {
+      var parametersString = ""
+      parameters.forEach { key, value in
+        parametersString += key + "=" + value + "&"
+      }
+      parametersString.removeLast()
+      self.httpBody = parametersString.data(using: .utf8)
+    }
+  }
+}
+
 public class KitsuHandler {
   private let decoder: JSONDecoder
-  
-  private let defaultSession = URLSession(configuration: .default)
+  private let session: URLSession
   private var dataTask: URLSessionDataTask?
   
-  public init(decoder: JSONDecoder) {
+  public init(decoder: JSONDecoder, session: URLSession?) {
     self.decoder = decoder
+    self.session = session ?? URLSession(configuration: .default)
   }
-  
-//  private func handleResponse(_ response: DataResponse<Data>, _ callback: (Data?, Error?) -> Void) {
-//    switch response.result {
-//    case .failure(let error): callback(nil, error)
-//    case .success: callback(response.result.value, nil)
-//    }
-//  }
   
   private func parseToObjectData(data: Data?) -> Data? {
     let dataJSON = try? JSONSerialization.jsonObject(with: data!) as! [String: Any?]
-    
     guard let objectData = try? JSONSerialization.data(withJSONObject: dataJSON!["data"] as Any) else { return nil }
-    
     return objectData
   }
   
@@ -49,10 +61,8 @@ public class KitsuHandler {
       callback(object)
     }
     
-    var request = URLRequest(url: url)
-    request.allHTTPHeaderFields = headers
+    let request = URLRequest(url: url, headers: headers)
     
-//    let request = Alamofire.request(url, headers: headers)
     self.doRequest(request, callback: innerCallback)
   }
 
@@ -119,13 +129,7 @@ public class KitsuHandler {
       "grant_type" : "password",
       "username" : name,
       "password" : password
-    ]
-    var parametersString = ""
-    parameters.forEach { key, value in
-      parametersString += key + "=" + value + "&"
-    }
-    parametersString.removeLast()
-    
+    ]    
     
     let headers = Constants.clientCredentialHeaders
 
@@ -135,22 +139,14 @@ public class KitsuHandler {
         else { return callback(nil) }
       callback(tokenResponse)
     }
+    let request = URLRequest(url: url, method: method, headers: headers, parameters: parameters)
     
-    var request = URLRequest(url: url)
-    request.httpMethod = method
-    request.allHTTPHeaderFields = headers
-    request.httpBody = parametersString.data(using: .utf8)
-    
-//    let request = Alamofire.request(url, method: method, parameters : parameters, headers: headers)
     self.doRequest(request, callback: innerCallback)
   }
   
   private func doRequest(_ request: URLRequest, callback: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
-//    request.responseData { response in
-//      self.handleResponse(response, callback)
-//    }
     dataTask?.cancel()
-    dataTask = defaultSession.dataTask(with: request, completionHandler: callback)
+    dataTask = session.dataTask(with: request, completionHandler: callback)
     dataTask?.resume()
   }
 }
