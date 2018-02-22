@@ -54,18 +54,16 @@ public class KitsuHandler {
                                                       callback: @escaping (T?) -> Void) {
     let urlString = Constants.requestBaseURL + T.requestURLString + String(objectID)
     guard let url = URL(string: urlString) else { return callback(nil) }
-    
-    var headers: [String: String]? = Constants.requestHeaders
-    if accessToken != nil { addAuthorizationHeader(with: accessToken!, to: &headers) }
+    var request = URLRequest(url: url, headers: Constants.requestHeaders)
+
+    if accessToken != nil { request.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
     
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
       let objectData = self.parseToObjectData(data: data)
-      guard let object: T = try? self.decoder.decode(T.self, from: objectData!) else { return callback(nil) }
+      let object: T? = try? self.decoder.decode(T.self, from: objectData!)
       callback(object)
     }
-    
-    let request = URLRequest(url: url, headers: headers)
     
     self.doRequest(request, callback: innerCallback)
   }
@@ -101,21 +99,16 @@ public class KitsuHandler {
   public func getCollection<T>(by urlString: String, with accessToken: String? = nil, callback: @escaping (SearchResult<T>?) -> Void) {
     
     guard let url = URL(string: urlString) else { return callback(nil) }
+    var request = URLRequest(url: url, headers: Constants.requestHeaders)
     
+    if accessToken != nil { request.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
+
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
-      guard let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
-        else { return callback(nil) }
+      let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
       callback(searchResult)
     }
     
-    var headers: [String: String]? = Constants.requestHeaders
-    
-    if accessToken != nil { addAuthorizationHeader(with: accessToken!, to: &headers) }
-
-    var request = URLRequest(url: url)
-    request.allHTTPHeaderFields = headers
-
     self.doRequest(request, callback: innerCallback)
   }
   
@@ -127,23 +120,21 @@ public class KitsuHandler {
   ///   - callback: The callback to be triggered when the list of objects is fetched
   public func getTokenResponse(with name: String, and password: String, callback: @escaping (TokenResponse?) -> ()) {
     guard let url = URL(string: Constants.tokenURL) else { return callback(nil) }
-    let method = "POST"
+    
     let parameters: [String : String] = [
       "grant_type" : "password",
       "username" : name,
       "password" : password
-    ]    
+    ]
     
-    let headers = Constants.clientCredentialHeaders
+    var request = URLRequest(url: url, headers: Constants.clientCredentialHeaders, parameters: parameters)
+    request.httpMethod = "POST"
 
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
-      guard let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
-        else { return callback(nil) }
+      let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
       callback(tokenResponse)
     }
-    var request = URLRequest(url: url, headers: headers, parameters: parameters)
-    request.httpMethod = method
     
     self.doRequest(request, callback: innerCallback)
   }
