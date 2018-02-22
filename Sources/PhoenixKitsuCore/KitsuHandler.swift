@@ -2,10 +2,8 @@ import Foundation
 import Requestable
 
 extension URLRequest {
-  init(url: URL, method: String? = "GET", headers: [String : String]?, parameters: [String : String]? = nil) {
+  init(url: URL, headers: [String : String]?, parameters: [String : String]? = nil) {
     self.init(url: url)
-    
-    self.httpMethod = method
     
     if let headers = headers {
       self.allHTTPHeaderFields = headers
@@ -38,6 +36,14 @@ public class KitsuHandler {
     return objectData
   }
   
+  private func addAuthorizationHeader(with token: String, to headers: inout [String: String]?) {
+    if headers != nil {
+      headers!["Authorization"] = "Bearer " + token
+    } else {
+      headers = ["Autherization": "Bearer " + token]
+    }
+  }
+  
   /// Retrieves a KitsuObject that corresponds with the given id and type, and feeds it to the given clojure
   ///
   /// - Parameters:
@@ -49,10 +55,8 @@ public class KitsuHandler {
     let urlString = Constants.requestBaseURL + T.requestURLString + String(objectID)
     guard let url = URL(string: urlString) else { return callback(nil) }
     
-    var headers = Constants.requestHeaders
-    if let token = accessToken {
-      headers["Autherization"] = "Bearer " + token
-    }
+    var headers: [String: String]? = Constants.requestHeaders
+    if accessToken != nil { addAuthorizationHeader(with: accessToken!, to: &headers) }
     
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
@@ -105,14 +109,13 @@ public class KitsuHandler {
       callback(searchResult)
     }
     
-    var headers = Constants.requestHeaders
-    if let token = accessToken {
-      headers["Autherization"] = "Bearer " + token
-    }
+    var headers: [String: String]? = Constants.requestHeaders
     
+    if accessToken != nil { addAuthorizationHeader(with: accessToken!, to: &headers) }
+
     var request = URLRequest(url: url)
     request.allHTTPHeaderFields = headers
-//    let request = Alamofire.request(url, headers: headers)
+
     self.doRequest(request, callback: innerCallback)
   }
   
@@ -139,7 +142,8 @@ public class KitsuHandler {
         else { return callback(nil) }
       callback(tokenResponse)
     }
-    let request = URLRequest(url: url, method: method, headers: headers, parameters: parameters)
+    var request = URLRequest(url: url, headers: headers, parameters: parameters)
+    request.httpMethod = method
     
     self.doRequest(request, callback: innerCallback)
   }
