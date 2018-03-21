@@ -26,9 +26,11 @@ public class KitsuHandler {
   private let session: URLSession
   private var dataTask: URLSessionDataTask?
   
-  public init(decoder: JSONDecoder = JSONDecoder(), session: URLSession = URLSession(configuration: .default)) {
+  public init(decoder: JSONDecoder, session: URLSession) {
     self.decoder = decoder
     self.session = session
+    
+    self.decoder.dateDecodingStrategy = .iso8601;
   }
   
   private func parseToObjectData(data: Data?) -> Data? {
@@ -127,6 +129,30 @@ public class KitsuHandler {
     var request = URLRequest(url: Constants.tokenURL, headers: headers, parameters: parameters)
     request!.httpMethod = "POST"
 
+    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
+      guard error == nil else { return callback(nil) }
+      let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
+      callback(tokenResponse)
+    }
+    
+    self.doRequest(request!, callback: innerCallback)
+  }
+  
+  /// Retrieves a tokenResponse from kitsu.io
+  ///
+  /// - Parameters:
+  ///   - refreshToken: The refreshToken of the user trying to authenticate
+  ///   - callback: The callback to be triggered when the list of objects is fetched
+  public func getTokenResponse(with refreshToken: String, callback: @escaping (TokenResponse?) -> ()) {
+    let headers = Constants.clientCredentialHeaders
+    let parameters: [String : String] = [
+      "grant_type" : "refresh_token",
+      "refresh_token" : refreshToken
+    ]
+    
+    var request = URLRequest(url: Constants.tokenURL, headers: headers, parameters: parameters)
+    request!.httpMethod = "POST"
+    
     let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
       guard error == nil else { return callback(nil) }
       let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)

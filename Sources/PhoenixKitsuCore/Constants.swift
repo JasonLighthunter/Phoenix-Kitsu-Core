@@ -1,4 +1,3 @@
-
 public enum Constants {
   private static let baseURL = "https://kitsu.io/api/"
   static let requestBaseURL = baseURL + "edge/"
