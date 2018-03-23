@@ -29,8 +29,6 @@ public class KitsuHandler {
   public init(decoder: JSONDecoder, session: URLSession) {
     self.decoder = decoder
     self.session = session
-    
-    self.decoder.dateDecodingStrategy = .iso8601;
   }
   
   private func parseToObjectData(data: Data?) -> Data? {
@@ -111,6 +109,12 @@ public class KitsuHandler {
     
     self.doRequest(request!, callback: innerCallback)
   }
+  
+//  private let tokenResponseCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
+//    guard error == nil else { return callback(nil) }
+//    let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
+//    callback(tokenResponse)
+//  }
   
   /// Retrieves a tokenResponse from kitsu.io
   ///
