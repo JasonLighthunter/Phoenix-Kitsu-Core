@@ -26,6 +26,8 @@ public class KitsuHandler {
   private let session: URLSession
   private var dataTask: URLSessionDataTask?
   
+  private typealias DataCallback = (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void
+  
   public init(decoder: JSONDecoder, session: URLSession) {
     self.decoder = decoder
     self.session = session
@@ -58,7 +60,7 @@ public class KitsuHandler {
 
     if accessToken != nil { request!.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
     
-    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
+    let innerCallback: DataCallback = { data, response, error in
       guard error == nil else { return callback(nil) }
       let objectData = self.parseToObjectData(data: data)
       let object: T? = try? self.decoder.decode(T.self, from: objectData!)
@@ -101,7 +103,7 @@ public class KitsuHandler {
     
     if accessToken != nil { request!.addValue(("Bearer " + accessToken!), forHTTPHeaderField: "Authorization") }
 
-    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
+    let innerCallback: DataCallback = { data, response, error in
       guard error == nil else { return callback(nil) }
       let searchResult = try? self.decoder.decode(SearchResult<T>.self, from: data!)
       callback(searchResult)
@@ -110,20 +112,15 @@ public class KitsuHandler {
     self.doRequest(request!, callback: innerCallback)
   }
   
-//  private let tokenResponseCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
-//    guard error == nil else { return callback(nil) }
-//    let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
-//    callback(tokenResponse)
-//  }
-  
   /// Retrieves a tokenResponse from kitsu.io
   ///
   /// - Parameters:
   ///   - username: The username of the user trying to authenticate
   ///   - password: The password of the user trying to authenticate
   ///   - callback: The callback to be triggered when the list of objects is fetched
-  public func getTokenResponse(with name: String, and password: String, callback: @escaping (TokenResponse?) -> ()) {
+  public func getAccessToken(with name: String, and password: String, callback: @escaping (TokenResponse?) -> Void) {
     let headers = Constants.clientCredentialHeaders
+    
     let parameters: [String : String] = [
       "grant_type" : "password",
       "username" : name,
@@ -133,7 +130,11 @@ public class KitsuHandler {
     var request = URLRequest(url: Constants.tokenURL, headers: headers, parameters: parameters)
     request!.httpMethod = "POST"
 
-    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
+    getTokenResponse(with: request, and: callback)
+  }
+  
+  private func getTokenResponse(with request: URLRequest?, and callback: @escaping (TokenResponse?) -> Void) {
+    let innerCallback: DataCallback = { data, response, error in
       guard error == nil else { return callback(nil) }
       let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
       callback(tokenResponse)
@@ -147,8 +148,9 @@ public class KitsuHandler {
   /// - Parameters:
   ///   - refreshToken: The refreshToken of the user trying to authenticate
   ///   - callback: The callback to be triggered when the list of objects is fetched
-  public func getTokenResponse(with refreshToken: String, callback: @escaping (TokenResponse?) -> ()) {
+  public func RefreshAccessToken(with refreshToken: String, callback: @escaping (TokenResponse?) -> Void) {
     let headers = Constants.clientCredentialHeaders
+    
     let parameters: [String : String] = [
       "grant_type" : "refresh_token",
       "refresh_token" : refreshToken
@@ -157,16 +159,10 @@ public class KitsuHandler {
     var request = URLRequest(url: Constants.tokenURL, headers: headers, parameters: parameters)
     request!.httpMethod = "POST"
     
-    let innerCallback: (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void = { data, response, error in
-      guard error == nil else { return callback(nil) }
-      let tokenResponse = try? self.decoder.decode(TokenResponse.self, from: data!)
-      callback(tokenResponse)
-    }
-    
-    self.doRequest(request!, callback: innerCallback)
+    getTokenResponse(with: request, and: callback)
   }
   
-  private func doRequest(_ request: URLRequest, callback: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+  private func doRequest(_ request: URLRequest, callback: @escaping DataCallback) {
     dataTask?.cancel()
     dataTask = session.dataTask(with: request, completionHandler: callback)
     dataTask?.resume()
