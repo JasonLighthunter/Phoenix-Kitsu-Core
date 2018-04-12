@@ -1,4 +1,4 @@
-public protocol KitsuObjectAttributesWithOptionalTimestamp : Decodable {
+public protocol KitsuObjectAttributesWithOptionalTimestamp: Decodable {
   var createdAt: String? {get}
   var updatedAt: String? {get}
 }

@@ -1,4 +1,4 @@
-public class StatusCounts: Decodable {
+public struct StatusCounts: Decodable {
   public let current: Int
   public let planned: Int
   public let completed: Int

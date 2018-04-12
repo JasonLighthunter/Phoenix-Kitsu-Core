@@ -1,3 +1,3 @@
-public class ImageMeta: Decodable {
+public struct ImageMeta: Decodable {
   public let dimensions: ImageMetaDimensions?
 }
