@@ -13,7 +13,7 @@ extension URLRequest {
     if let parameters = parameters {
       var parametersString = ""
       parameters.forEach { key, value in
-        parametersString += key + "=" + value + "&"
+        parametersString += String(format: "%@=%@&", key, value)
       }
       parametersString.removeLast()
       self.httpBody = parametersString.data(using: .utf8)
@@ -73,7 +73,7 @@ public class KitsuHandler {
   private func addFilters(_ filters: [String: String]?, to url: inout String) {
     if let filters = filters {
       for (key, value) in filters {
-        url += "?filter[\(key)]=\(value)"
+        url += String(format: "?filter[%@]=%@", key, value)
       }
     }
   }
