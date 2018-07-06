@@ -1,4 +1,4 @@
-public class PagingLinks: Decodable {
+public struct PagingLinks: Decodable {
   public let first: String
   public let prev: String?
   public let next: String?
